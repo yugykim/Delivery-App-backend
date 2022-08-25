@@ -1,0 +1,41 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { truncate } from 'fs';
+import { createRestaurantDto } from './dtos/create-restaurant.dto';
+import { updateRestaurantDto } from './dtos/update-restaurant.dto';
+import { Restaurant } from './entities/restaurant.entity';
+import { RestaurantService } from './restaurant.service';
+
+@Resolver(() => Restaurant)
+export class RestaurantsResolver {
+  constructor(private readonly restaurantService: RestaurantService) {}
+  @Query(() => [Restaurant])
+  restaurants(): Promise<Restaurant[]> {
+    return this.restaurantService.getAll();
+  }
+  @Mutation(() => Boolean)
+  async createRestaurant(
+    @Args('input') createRestaurantDto: createRestaurantDto,
+  ): Promise<boolean> {
+    try {
+      await this.restaurantService.createRestaurant(createRestaurantDto);
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async updateRestaurant(
+    @Args('input') updateRestaurantDto: updateRestaurantDto,
+  ) {
+    try {
+      await this.restaurantService.updateRestaurant(updateRestaurantDto);
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+}
