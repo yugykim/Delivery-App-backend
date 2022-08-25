@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { truncate } from 'fs';
 import { createRestaurantDto } from './dtos/create-restaurant.dto';
 import { updateRestaurantDto } from './dtos/update-restaurant.dto';
 import { Restaurant } from './entities/restaurant.entity';

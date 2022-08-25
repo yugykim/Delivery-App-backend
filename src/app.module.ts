@@ -6,6 +6,9 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { CommonModule } from './common/common.module';
+import { User } from './users/entities/user.entity';
+import { UsersModule } from './users/users.module';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -33,14 +36,16 @@ database, this means that graphql modue should be in this*/
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
-      logging: true,
-      entities: [Restaurant],
+      logging: process.env.NODE_ENV !== 'prod',
+      entities: [User],
     }),
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
     }),
+    UsersModule,
     RestaurantsModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
