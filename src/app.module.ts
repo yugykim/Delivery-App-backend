@@ -9,6 +9,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
 import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { JwtModule } from './jwt/jwt.module';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -25,6 +26,7 @@ database, this means that graphql modue should be in this*/
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        SECRET_KEY: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -43,6 +45,7 @@ database, this means that graphql modue should be in this*/
       driver: ApolloDriver,
       autoSchemaFile: true,
     }),
+    JwtModule.forRoot(),
     UsersModule,
     RestaurantsModule,
     CommonModule,
