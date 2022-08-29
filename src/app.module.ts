@@ -26,7 +26,7 @@ database, this means that graphql modue should be in this*/
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
-        SECRET_KEY: Joi.string().required(),
+        PRIATE_KEY: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -45,7 +45,9 @@ database, this means that graphql modue should be in this*/
       driver: ApolloDriver,
       autoSchemaFile: true,
     }),
-    JwtModule.forRoot(),
+    JwtModule.forRoot({
+      privateKey: process.env.PRIATE_KEY,
+    }),
     UsersModule,
     RestaurantsModule,
     CommonModule,

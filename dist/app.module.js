@@ -57,7 +57,7 @@ AppModule = __decorate([
                     DB_USERNAME: Joi.string().required(),
                     DB_PASSWORD: Joi.string().required(),
                     DB_NAME: Joi.string().required(),
-                    SECRET_KEY: Joi.string().required(),
+                    PRIATE_KEY: Joi.string().required(),
                 }),
             }),
             typeorm_1.TypeOrmModule.forRoot({
@@ -75,7 +75,9 @@ AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
             }),
-            jwt_module_1.JwtModule.forRoot(),
+            jwt_module_1.JwtModule.forRoot({
+                privateKey: process.env.PRIATE_KEY,
+            }),
             users_module_1.UsersModule,
             restaurants_module_1.RestaurantsModule,
             common_module_1.CommonModule,
