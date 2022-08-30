@@ -12,7 +12,6 @@ import { JwtService } from 'src/jwt/jwt.service';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    private readonly config: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -60,10 +59,7 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
-      const token = jwt.sign(
-        { id: user.id },
-        this.config.get('CONFIG_OPTIONS'),
-      );
+      const token = this.jwtService.sign(user.id);
       return {
         ok: true,
         token,
@@ -74,5 +70,9 @@ export class UsersService {
         error,
       };
     }
+  }
+
+  async findById(id: number): Promise<User> {
+    return this.users.findOne({ where: { id } });
   }
 }

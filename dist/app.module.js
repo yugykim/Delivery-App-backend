@@ -36,12 +36,18 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const graphql_1 = require("@nestjs/graphql");
 const typeorm_1 = require("@nestjs/typeorm");
-const restaurants_module_1 = require("./restaurants/restaurants.module");
-const common_module_1 = require("./common/common.module");
 const user_entity_1 = require("./users/entities/user.entity");
 const users_module_1 = require("./users/users.module");
 const jwt_module_1 = require("./jwt/jwt.module");
+const jwt_middleware_1 = require("./jwt/jwt.middleware");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
+            path: '/graphql',
+            method: common_1.RequestMethod.POST,
+        });
+    }
 };
 AppModule = __decorate([
     (0, common_1.Module)({
@@ -74,13 +80,13 @@ AppModule = __decorate([
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: true,
+                context: ({ req }) => ({ user: req['user'] }),
             }),
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIATE_KEY,
             }),
             users_module_1.UsersModule,
-            restaurants_module_1.RestaurantsModule,
-            common_module_1.CommonModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [],
         providers: [],
