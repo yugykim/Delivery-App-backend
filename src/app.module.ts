@@ -50,7 +50,7 @@ database, this means that graphql modue should be in this*/
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      context: ({ req }) => ({ user: req['user'] }), //just for authentication, apollo server's context graphql context that we can use all resolvers.
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIATE_KEY,
