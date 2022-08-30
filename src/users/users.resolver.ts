@@ -5,11 +5,16 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import {
   createAccountInput,
   createAccountOutput,
-} from './dtos/create-account-dto';
+} from './dtos/create-account.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
+import {
+  VerifyEmailInputput,
+  VerifyEmailOutput,
+} from './dtos/verify-email.dto';
 import { User } from './entities/user.entity';
+import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
 
 @Resolver(() => User)
@@ -85,6 +90,23 @@ export class UsersResolver {
       return {
         ok: false,
         error: "Can't edit Profile",
+      };
+    }
+  }
+
+  @Mutation(() => VerifyEmailOutput)
+  async verifyEmail(
+    @Args('input') { code }: VerifyEmailInputput,
+  ): Promise<VerifyEmailOutput> {
+    try {
+      await this.usersService.verifyEmail(code);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
       };
     }
   }
