@@ -5,10 +5,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { MutationOutput } from '../dtos/output.dto';
 
 @ObjectType() //graphql schema
 @Entity() //For typeOrm
-export class CoreEntity {
+export class CoreEntity extends MutationOutput {
   @PrimaryGeneratedColumn()
   @Field(() => Number)
   id: number;

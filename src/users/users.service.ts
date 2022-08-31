@@ -7,6 +7,8 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
 import { createAccountInput } from './dtos/create-account.dto';
+import { VerifyEmailOutput } from './dtos/verify-email.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +17,7 @@ export class UsersService {
     @InjectRepository(Verification)
     private readonly verifications: Repository<Verification>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async createAccount({
@@ -33,11 +36,12 @@ export class UsersService {
       const user = await this.users.save(
         this.users.create({ email, password, role }),
       );
-      await this.verifications.save(
+      const verification = await this.verifications.save(
         this.verifications.create({
           user,
         }),
       );
+      this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
       //make error
@@ -71,8 +75,8 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
-      console.log(user);
       const token = this.jwtService.sign(user.id);
+      console.log(token);
       return {
         ok: true,
         token,
@@ -93,36 +97,49 @@ export class UsersService {
   async editProfile(
     id: number,
     { email, password }: EditProfileInput, // distructing syntax
-  ): Promise<User> {
+  ): Promise<{ ok: boolean; error?: string }> {
     const user = await this.users.findOne({ where: { id } });
-    // change actual entity with javascript instead of DB
-    if (email) {
-      user.email = email;
-      user.verified = false;
-      await this.verifications.save(this.verifications.create({ user }));
-    }
-    if (password) {
-      user.password = password;
+    try {
+      // change actual entity with javascript instead of DB
+      if (email) {
+        user.email = email;
+        user.verified = false;
+        const verification = await this.verifications.save(
+          this.verifications.create({ user }),
+        );
+        this.mailService.sendVerificationEmail(user.email, verification.code);
+      }
+      if (password) {
+        user.password = password;
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
     return this.users.save(user); //save is all given entities
   }
 
-  async verifyEmail(code: string): Promise<boolean> {
+  async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
       const verification = await this.verifications.findOne({
         where: { code },
-        relations: ['user'],
-        loadEagerRelations: true, //As default, typeorm doesn't call relationship, so we should request relationship to typeorm.
+        relations: ['user'], //As default, typeorm doesn't call relationship, so we should request relationship to typeorm.
       });
       if (verification) {
         verification.user.verified = true;
-        this.users.save(verification.user); //if we send password with users.save() and the object has the password, then the password will be hashed
-        return true;
+        await this.users.save(verification.user); //if we send password with users.save() and the object has the password, then the password will be hashed
+        await this.verifications.delete(verification.id); //when user is verficated, then verification id delete
+        return {
+          ok: true,
+        };
       }
-      return false;
-    } catch (e) {
-      console.log(e);
-      return false;
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
   }
 }

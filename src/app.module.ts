@@ -9,14 +9,13 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RestaurantsModule } from './restaurants/restaurants.module';
-import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { AuthModule } from './auth/auth.module';
 import { Verification } from './users/entities/verification.entity';
+import { MailModule } from './mail/mail.module';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -34,6 +33,9 @@ database, this means that graphql modue should be in this*/
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIATE_KEY: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(),
+        MAILGUN_DOMAIN_NAME: Joi.string().required(),
+        MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -58,6 +60,11 @@ database, this means that graphql modue should be in this*/
     }),
     UsersModule,
     AuthModule,
+    MailModule.forRoot({
+      apiKey: process.env.MAILGUN_API_KEY,
+      fromEmail: process.env.MAILGUN_FROM_EMAIL,
+      domain: process.env.MAILGUN_DOMAIN_NAME,
+    }),
   ],
   controllers: [],
   providers: [],
