@@ -29,6 +29,7 @@ export class UsersService {
     // check new user& hash the password
     try {
       const exists = await this.users.findOne({ where: { email } });
+
       if (exists) {
         // make error
         return { ok: false, error: 'There is a user with that email already' };
@@ -41,6 +42,7 @@ export class UsersService {
           user,
         }),
       );
+
       this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
