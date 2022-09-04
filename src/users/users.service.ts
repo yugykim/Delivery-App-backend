@@ -9,6 +9,7 @@ import { Verification } from './entities/verification.entity';
 import { createAccountInput } from './dtos/create-account.dto';
 import { VerifyEmailOutput } from './dtos/verify-email.dto';
 import { MailService } from 'src/mail/mail.service';
+import { UserProfileOutput } from './dtos/user-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -78,7 +79,6 @@ export class UsersService {
         };
       }
       const token = this.jwtService.sign(user.id);
-      console.log(token);
       return {
         ok: true,
         token,
@@ -91,8 +91,19 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<User> {
-    return this.users.findOne({ where: { id } }); //TypeOrm
+  async findById(id: number): Promise<UserProfileOutput> {
+    try {
+      const user = await this.users.findOneOrFail({ where: { id } });
+      return {
+        ok: true,
+        user: user,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'User not found',
+      };
+    }
   }
 
   //do not send any undefind value
@@ -102,7 +113,7 @@ export class UsersService {
   ): Promise<{ ok: boolean; error?: string }> {
     const user = await this.users.findOne({ where: { id } });
     try {
-      // change actual entity with javascript instead of DB
+      // change actua entity with javascript instead of DB
       if (email) {
         user.email = email;
         user.verified = false;
@@ -115,10 +126,7 @@ export class UsersService {
         user.password = password;
       }
     } catch (error) {
-      return {
-        ok: false,
-        error,
-      };
+      return { ok: false, error: 'Could not update profile.' };
     }
     return this.users.save(user); //save is all given entities
   }
