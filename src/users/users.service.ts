@@ -127,8 +127,8 @@ export class UsersService {
       }
     } catch (error) {
       return { ok: false, error: 'Could not update profile.' };
-    }
-    return this.users.save(user); //save is all given entities
+    } //save is all given entities
+    return this.users.save(user);
   }
 
   async verifyEmail(code: string): Promise<VerifyEmailOutput> {
@@ -145,10 +145,11 @@ export class UsersService {
           ok: true,
         };
       }
+      return { ok: false, error: 'verification not found' };
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: 'could not verify email',
       };
     }
   }
