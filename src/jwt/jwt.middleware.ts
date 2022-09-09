@@ -20,7 +20,9 @@ export class JwtMiddleware implements NestMiddleware {
           req['user'] = user;
           //req meet midleware first, so middle can modify the type of reqest.keep traveling down to resolver
           //if we send wrong token, it won't work
-        } catch (e) {}
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
     next();

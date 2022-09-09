@@ -1,4 +1,4 @@
-import { ApolloDriver } from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as Joi from 'joi';
 import {
   MiddlewareConsumer,
@@ -26,7 +26,7 @@ database, this means that graphql modue should be in this*/
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
       ignoreEnvFile: process.env.NODE_ENV === 'prod',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('dev', 'prod').required(), ////validate environment(Schema) -> safe security. it makes being availbe to check wether process.env has variable or not
+        NODE_ENV: Joi.string().valid('dev', 'prod', 'test').required(), ////validate environment(Schema) -> safe security. it makes being availbe to check wether process.env has variable or not
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.string().required(),
         DB_USERNAME: Joi.string().required(),
@@ -47,10 +47,11 @@ database, this means that graphql modue should be in this*/
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
-      logging: process.env.NODE_ENV !== 'prod',
+      logging:
+        process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [User, Verification],
     }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
       context: ({ req }) => ({ user: req['user'] }), //just for authentication, apollo server's context graphql context that we can use all resolvers.
@@ -58,13 +59,12 @@ database, this means that graphql modue should be in this*/
     JwtModule.forRoot({
       privateKey: process.env.PRIATE_KEY,
     }),
-    UsersModule,
-    AuthModule,
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
       domain: process.env.MAILGUN_DOMAIN_NAME,
     }),
+    UsersModule,
   ],
   controllers: [],
   providers: [],
