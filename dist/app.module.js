@@ -40,7 +40,6 @@ const user_entity_1 = require("./users/entities/user.entity");
 const users_module_1 = require("./users/users.module");
 const jwt_module_1 = require("./jwt/jwt.module");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
-const auth_module_1 = require("./auth/auth.module");
 const verification_entity_1 = require("./users/entities/verification.entity");
 const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
@@ -59,7 +58,7 @@ AppModule = __decorate([
                 envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
                 ignoreEnvFile: process.env.NODE_ENV === 'prod',
                 validationSchema: Joi.object({
-                    NODE_ENV: Joi.string().valid('dev', 'prod').required(),
+                    NODE_ENV: Joi.string().valid('dev', 'prod', 'test').required(),
                     DB_HOST: Joi.string().required(),
                     DB_PORT: Joi.string().required(),
                     DB_USERNAME: Joi.string().required(),
@@ -79,7 +78,7 @@ AppModule = __decorate([
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
                 synchronize: process.env.NODE_ENV !== 'prod',
-                logging: process.env.NODE_ENV !== 'prod',
+                logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
                 entities: [user_entity_1.User, verification_entity_1.Verification],
             }),
             graphql_1.GraphQLModule.forRoot({
@@ -90,13 +89,12 @@ AppModule = __decorate([
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIATE_KEY,
             }),
-            users_module_1.UsersModule,
-            auth_module_1.AuthModule,
             mail_module_1.MailModule.forRoot({
                 apiKey: process.env.MAILGUN_API_KEY,
                 fromEmail: process.env.MAILGUN_FROM_EMAIL,
                 domain: process.env.MAILGUN_DOMAIN_NAME,
             }),
+            users_module_1.UsersModule,
         ],
         controllers: [],
         providers: [],
