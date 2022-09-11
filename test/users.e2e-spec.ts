@@ -226,7 +226,50 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  it.todo('me');
-  it.todo('verifyEmail');
+  describe('me', () => {
+    it('should return find my profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `{
+          me {
+            email,
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: {
+              data: {
+                me: { email },
+              },
+            },
+          } = res;
+          expect(email).toBe(testUser.email);;
+        });
+    });
+    it('should not allow logged out user', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+        me {
+          email,
+        }
+      }`,
+        })
+        .expect(200)
+        .expect((res) => {  
+          const {
+            body: { errors },
+          } = res;
+          const [error] = errors;
+          expect(error.message).toBe('Forbidden resource');
+        });
+    });
+  });
+  //// .set('X-JWT', jwtToken) << remove this not to log out user
   it.todo('editProfile');
 });
