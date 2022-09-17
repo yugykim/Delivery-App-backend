@@ -113,10 +113,11 @@ export class UsersService {
   ): Promise<{ ok: boolean; error?: string }> {
     const user = await this.users.findOne({ where: { id } });
     try {
-      // change actua entity with javascript instead of DB
+      // change actual entity with javascript instead of DB
       if (email) {
         user.email = email;
         user.verified = false;
+        await this.verifications.delete({ user: { id: user.id } });
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
@@ -125,10 +126,12 @@ export class UsersService {
       if (password) {
         user.password = password;
       }
+      this.users.save(user);
     } catch (error) {
       return { ok: false, error: 'Could not update profile.' };
-    } //save is all given entities
-    return this.users.save(user);
+    }
+    //save is all given entities
+    return { ok: true, error: null };
   }
 
   async verifyEmail(code: string): Promise<VerifyEmailOutput> {
