@@ -18,3 +18,9 @@ the backend of uber eats clone
 - See Profile
 - Edit Profile
 _ Verify Email
+
+## Restaurant Model
+- name
+- category
+- address
+- coverImg
