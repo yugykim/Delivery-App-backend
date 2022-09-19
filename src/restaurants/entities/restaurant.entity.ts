@@ -33,6 +33,6 @@ export class Restaurant extends CoreEntity {
   category: Category;
 
   @Field(() => User) // do not delete restaurant when we delete category
-  @ManyToOne(() => User, (user) => user.restaurants)
+  @ManyToOne(() => User, (user) => user.restaurants, { onDelete: 'CASCADE' })
   owner: User;
 }
