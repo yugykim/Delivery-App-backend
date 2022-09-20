@@ -45,6 +45,7 @@ const mail_module_1 = require("./mail/mail.module");
 const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
 const category_entity_1 = require("./restaurants/entities/category.entity");
 const restaurants_module_1 = require("./restaurants/restaurants.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
@@ -97,6 +98,7 @@ AppModule = __decorate([
                 fromEmail: process.env.MAILGUN_FROM_EMAIL,
                 domain: process.env.MAILGUN_DOMAIN_NAME,
             }),
+            auth_module_1.AuthModule,
             users_module_1.UsersModule,
             restaurants_module_1.RestaurantsModule,
         ],
