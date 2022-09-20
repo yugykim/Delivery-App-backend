@@ -16,11 +16,12 @@ export class RestaurantsResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Mutation(() => createRestaurantOutput)
+  @Role(['Owner']) //only owner can create a restaurant
   async createRestaurant(
     @AuthUser() authUser: User, // owner of the restaurnat is the login user
     @Args('input') createRestaurantInput: createRestaurantInput,
   ): Promise<createRestaurantOutput> {
-    return await this.restaurantService.createRestaurant(
+    return this.restaurantService.createRestaurant(
       authUser,
       createRestaurantInput,
     );
