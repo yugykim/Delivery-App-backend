@@ -2,11 +2,22 @@
 
 the backend of uber eats 
 
-## User Entity:
+## Tech stacks 
+- NestJS
+- Typescript
+- TypeORM
+- GraphQL
+
+## Feature
+- Unit Testing
+- End to End Testing
+- JWT Authentication
+
+## User Entity
+
 - id
 - createAt
 - updateAt
-
 - email
 - password
 - role(client|owner|deliver)
@@ -20,6 +31,7 @@ the backend of uber eats
 _ Verify Email
 
 ## Restaurant Model
+
 - name
 - category
 - address
