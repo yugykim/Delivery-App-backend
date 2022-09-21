@@ -1,8 +1,8 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsString, Length } from 'class-validator';
+import { IsNumber, IsString, Length } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Category } from './category.entity';
 
 //database model
@@ -25,6 +25,9 @@ export class Restaurant extends CoreEntity {
   @IsString()
   address: string;
 
+  @Field(() => Number)
+  restaurantID: number;
+
   @Field(() => Category, { nullable: true }) // do not delete restaurant when we delete category
   @ManyToOne(() => Category, (category) => category.restaurants, {
     nullable: true,
@@ -35,4 +38,7 @@ export class Restaurant extends CoreEntity {
   @Field(() => User) // do not delete restaurant when we delete category
   @ManyToOne(() => User, (user) => user.restaurants, { onDelete: 'CASCADE' })
   owner: User;
+
+  @RelationId((restaurant: Restaurant) => restaurant.owner)
+  ownerId: number;
 }
