@@ -1,6 +1,6 @@
 # uber eats 
 
-the backend of uber eats clone
+the backend of uber eats 
 
 ## User Entity:
 - id
