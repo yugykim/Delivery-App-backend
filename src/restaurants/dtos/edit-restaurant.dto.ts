@@ -1,4 +1,4 @@
-import { InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
 import { MutationOutput } from 'src/common/dtos/output.dto';
 import { createRestaurantInput } from './create-restaurant.dto';
 //partialType takes all of property in class, and made optional,and it became

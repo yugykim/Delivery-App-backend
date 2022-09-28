@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
@@ -20,12 +20,10 @@ export class RestaurantService {
     private readonly categories: Repository<Category>,
   ) {}
 
-  async getOrCreateCategory(name: string): Promise<Category> {
+  async getOrCreate(name: string): Promise<Category> {
     const categoryName = name.trim().toLowerCase();
     const categorySlug = categoryName.replace(/ /g, '-');
-    let category = await this.categories.findOne({
-      where: { slug: categorySlug },
-    });
+    let category = await this.categories.findOne({ slug: categorySlug });
     if (!category) {
       category = await this.categories.save(
         this.categories.create({ slug: categorySlug, name: categoryName }),
@@ -41,8 +39,8 @@ export class RestaurantService {
     try {
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.owner = owner;
-      //formatting categoryName
-      const category = await this.getOrCreateCategory(
+      //formatting categoryNames
+      const category = await this.getOrCreate(
         createRestaurantInput.categoryName,
       );
       newRestaurant.category = category;
@@ -60,13 +58,16 @@ export class RestaurantService {
 
   async editRestaurant(
     owner: User,
-    { restaurantID }: EditRestaurantInput,
+    editRestaurantInput: EditRestaurantInput,
   ): Promise<EditProfileOutput> {
-    const restaurant = await this.restaurants.findOne({
-      where: { restaurantID },
-      relations: ['owner'], //Indicates what relations of entity should be loaded (simplified left join form).
-    });
     try {
+      const restaurant = await this.restaurants.findOne({
+        where: {
+          id: editRestaurantInput.restaurantID,
+        },
+        relations: ['owner'],
+      });
+      console.log(editRestaurantInput.restaurantID);
       if (!restaurant) {
         return {
           ok: false,
@@ -79,6 +80,18 @@ export class RestaurantService {
           error: "You can't edit a restaurant that you don't own",
         };
       }
+      let category: Category = null;
+      if (editRestaurantInput.categoryName) {
+        category = await this.getOrCreate(editRestaurantInput.categoryName);
+      }
+      await this.restaurants.save([
+        {
+          id: editRestaurantInput.restaurantID,
+          ...editRestaurantInput,
+          ...(category && { category }), //if category exists, return Objn with = category
+          //if it is null, we don't want to include category name so that we should write like this
+        },
+      ]);
       return {
         ok: true,
       };
