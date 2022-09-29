@@ -15,36 +15,6 @@ the backend of uber eats
 
 ## User Entity
 
-<<<<<<< HEAD
-## Restaurant 
-- See categories
-- See Restaurants by Category 
-- See Restaurant
-
-- Edit Restaurant
-- Delete Restaurant
-
-- Create Dish
-- Edit Dish
-- Delete Dish
-
-## Restaurant Model
-- name
-- category
-- address
-- coverImg
-
-## User 
-
-- Create Account
-- Log In
-- See Profile
-- Edit Profile
-- Verify Email
-
-## User Entity:
-=======
->>>>>>> 705710bf6b42112897394392486c7ea6d1b2a929
 - id
 - createAt
 - updateAt
@@ -53,12 +23,20 @@ the backend of uber eats
 - role(client|owner|deliver)
 
 
-<<<<<<< HEAD
-=======
 ## Restaurant Model
 
 - name
 - category
 - address
 - coverImg
->>>>>>> 705710bf6b42112897394392486c7ea6d1b2a929
+
+- Delete Restaurant
+* See categories
+* See Restauratns by Category 
+* See Restaurant
+
+- Create Dish
+
+- Edit Dish
+
+- Delete Dish
