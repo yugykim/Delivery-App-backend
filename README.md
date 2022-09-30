@@ -31,9 +31,9 @@ the backend of uber eats
 - coverImg
 
 - Delete Restaurant
-* See categories
-* See Restauratns by Category 
-* See Restaurant
+- See categories
+-  See Restauratns by Category 
+-  See Restaurant
 
 - Create Dish
 
