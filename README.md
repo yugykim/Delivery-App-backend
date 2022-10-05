@@ -32,8 +32,9 @@ the backend of uber eats
 
 - Delete Restaurant
 - See categories
--  See Restauratns by Category 
--  See Restaurant
+- See Restauratns by Category 
+- See Restaurant
+- Search Restaurant
 
 - Create Dish
 
