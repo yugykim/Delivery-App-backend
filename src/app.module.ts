@@ -19,6 +19,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
 import { Category } from './restaurants/entities/category.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { AuthModule } from './auth/auth.module';
+import { Dish } from './restaurants/entities/dish.entity';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -52,7 +53,7 @@ database, this means that graphql modue should be in this*/
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category],
+      entities: [User, Verification, Restaurant, Category, Dish],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
