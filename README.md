@@ -37,7 +37,10 @@ the backend of uber eats
 - Search Restaurant
 
 - Create Dish
-
 - Edit Dish
-
 - Delete Dish
+
+- Orders CRUD
+- Orders Subscription (owner, customer, delivery)
+
+- Payments(CRON)
