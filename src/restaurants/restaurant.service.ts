@@ -2,17 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
-import { Like, Raw, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import {
   createRestaurantInput,
   createRestaurantOutput,
 } from './dtos/create-restaurant.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
 import {
   DeleteRestaurantInput,
   DeleteRestaurantOutput,
 } from './dtos/delete-restaurant.dto';
+import { EditDishOutput, EditDishInput } from './dtos/edit-dish.dto';
 import { EditRestaurantInput } from './dtos/edit-restaurant.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
@@ -21,6 +24,7 @@ import {
   SearchRestaurantOutput,
 } from './dtos/search-restaurant.dto';
 import { Category } from './entities/category.entity';
+import { Dish } from './entities/dish.entity';
 import { Restaurant } from './entities/restaurant.entity';
 
 @Injectable()
@@ -30,6 +34,8 @@ export class RestaurantService {
     private readonly restaurants: Repository<Restaurant>,
     @InjectRepository(Category)
     private readonly categories: Repository<Category>,
+    @InjectRepository(Dish)
+    private readonly dishes: Repository<Dish>,
   ) {}
 
   async getOrCreate(name: string): Promise<Category> {
@@ -236,6 +242,7 @@ export class RestaurantService {
         where: {
           id: restaurantId,
         },
+        relations: ['menu'], //
       });
       if (!restaurant) {
         return {
@@ -277,6 +284,113 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not search for restaurants',
+      };
+    }
+  }
+
+  async createDish(
+    owner: User,
+    createDishInput: CreateDishInput,
+  ): Promise<CreateDishOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: {
+          id: createDishInput.restaurantID,
+        },
+      });
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'Could not find a restaurant',
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        return {
+          ok: false,
+          error: 'You can not do that',
+        };
+      }
+      await this.dishes.save(
+        this.dishes.create({ ...createDishInput, restaurant }),
+      );
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: 'Could not create a dish',
+      };
+    }
+  }
+
+  async editDish(
+    owner: User,
+    editDishinput: EditDishInput,
+  ): Promise<EditDishOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: {
+          id: editDishinput.dishId,
+        },
+      });
+      if (!dish) {
+        return {
+          ok: false,
+          error: 'cound not delete a dish',
+        };
+      }
+      await this.dishes.save([
+        {
+          id: editDishinput.dishId,
+          ...editDishinput,
+        },
+      ]);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: 'Could not create a dish',
+      };
+    }
+  }
+
+  async deleteDish(
+    owner: User,
+    { dishId }: DeleteDishInput,
+  ): Promise<DeleteDishOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: {
+          id: dishId,
+        },
+        relations: ['restaurant'],
+      });
+      console.log('will Delete', dishId);
+      if (!dish) {
+        return {
+          ok: false,
+          error: 'could not find a dish',
+        };
+      }
+      if (owner.id !== dish.restaurant.ownerId) {
+        return {
+          ok: false,
+          error: 'You are not a owner',
+        };
+      }
+      await this.dishes.delete(dishId);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'could not delete dish',
       };
     }
   }
