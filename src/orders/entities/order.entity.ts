@@ -50,7 +50,7 @@ export class Order extends CoreEntity {
   @Field(() => [OrderItem])
   @ManyToMany(() => OrderItem)
   @JoinTable() //Owner side relationship in ManyToMany
-  items: Dish[];
+  items: OrderItem[];
 
   @Column({ nullable: true })
   @Field(() => Float, { nullable: true })
