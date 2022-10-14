@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { stat } from 'fs';
+import { userInfo } from 'os';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
-import { GetOrdersOutput, GetOrdersInput } from './dtos/get-order.dto';
-import { Order } from './entities/order.entity';
+import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
+import { GetOrderOutput, GetOrderInput } from './dtos/get-order.dto';
+import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
+import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order.item.entity';
 
 @Injectable()
@@ -107,36 +111,148 @@ export class OrderService {
         orders = await this.orders.find({
           where: {
             customer: user,
-            status,
+            ...(status && { status }), //add obj conditionally
           },
         });
       } else if (user.role === UserRole.Delivery) {
         orders = await this.orders.find({
           where: {
             driver: user,
-            status,
+            ...(status && { status }),
           },
         });
       } else if (user.role === UserRole.Owner) {
         const restaurants = await this.restaurants.find({
           where: {
             owner: user,
-            status,
+            ...(status && { status }),
           },
           relations: ['orders'],
         });
-        console.log(restaurants);
-        orders = restaurants.map((restaurant) => restaurant.orders).flat();
-        console.log(orders);
-        return {
-          ok: true,
-          orders,
-        };
+        orders = restaurants.map((restaurant) => restaurant.orders).flat(); //map is generated the new array
+        if (status) {
+          orders = orders.filter((order) => order.status === status); // filter is to eleminate one's not fullfield this conditions
+        }
       }
+      return {
+        ok: true,
+        orders,
+      };
     } catch {
       return {
         ok: false,
         error: 'Could not get orders',
+      };
+    }
+  }
+
+  canSeeOrder(user: User, order: Order): boolean {
+    let canSee = true;
+    if (user.role === UserRole.Customer && order.customerId !== user.id) {
+      canSee = false;
+    }
+    if (user.role === UserRole.Delivery && order.driverId !== user.id) {
+      canSee = false;
+    }
+    if (user.role === UserRole.Owner && order.restaurant.ownerId !== user.id) {
+      canSee = false;
+    }
+    return canSee;
+  }
+
+  async getOrder(
+    user: User,
+    { id: orderId }: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: {
+          id: orderId,
+        },
+        relations: ['restaurant'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: 'Order is not exist',
+        };
+      }
+      if (!this.canSeeOrder(user, order)) {
+        return {
+          ok: false,
+          error: 'you cant see that',
+        };
+      }
+
+      return {
+        ok: true,
+        order,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not load order.',
+      };
+    }
+  }
+
+  async editOrder(
+    user: User,
+    { id: orderId, status }: EditOrderInput,
+  ): Promise<EditOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: {
+          id: orderId,
+        },
+        relations: ['restaurant'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: 'Order not found',
+        };
+      }
+      if (!this.canSeeOrder(user, order)) {
+        return {
+          ok: false,
+          error: 'you cant see that',
+        };
+      }
+      let canEdit = true;
+      if (user.role === UserRole.Customer) {
+        canEdit = false;
+      }
+      if (user.role === UserRole.Owner) {
+        if (status !== OrderStatus.Cooking && status !== OrderStatus.Cooked) {
+          canEdit = false;
+        }
+      }
+      if (user.role === UserRole.Delivery) {
+        if (status !== OrderStatus.PickedUp && status !== OrderStatus.Delived) {
+          canEdit = false;
+        }
+      }
+      if (!canEdit) {
+        return {
+          ok: false,
+          error: "You can't do that.",
+        };
+      }
+      await this.orders.save([
+        {
+          id: orderId,
+          status,
+        },
+      ]);
+
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not edit an order',
       };
     }
   }
