@@ -43,3 +43,6 @@ the backend of uber eats
 - Orders CRUD
 - Orders Subscription (owner, customer, delivery)
 - Payments(CRON)
+
+- Orders Subscription (Owner, Customer, Deliver)
+- Payments (CRON)
