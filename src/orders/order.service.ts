@@ -213,12 +213,6 @@ export class OrderService {
           error: 'Order not found',
         };
       }
-      if (!this.canSeeOrder(user, order)) {
-        return {
-          ok: false,
-          error: 'you cant see that',
-        };
-      }
       let canEdit = true;
       if (user.role === UserRole.Customer) {
         canEdit = false;
