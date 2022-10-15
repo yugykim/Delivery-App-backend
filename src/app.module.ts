@@ -68,8 +68,16 @@ database, this means that graphql modue should be in this*/
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      installSubscriptionHandlers: true, // this will labeled all of websockets in our server.
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] }), //just for authentication, apollo server's context graphql context that we can use all resolvers.
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams: any) => ({
+            token: connectionParams['x-jwt'],
+          }),
+        },
+      },
+      context: ({ req }) => ({ token: req.headers['x-jwt'] }),
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIATE_KEY,
@@ -88,11 +96,4 @@ database, this means that graphql modue should be in this*/
   providers: [],
 })
 // when we want to use specific module
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.POST,
-    });
-  }
-}
+export class AppModule {}
