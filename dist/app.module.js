@@ -39,7 +39,6 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./users/entities/user.entity");
 const users_module_1 = require("./users/users.module");
 const jwt_module_1 = require("./jwt/jwt.module");
-const jwt_middleware_1 = require("./jwt/jwt.middleware");
 const verification_entity_1 = require("./users/entities/verification.entity");
 const mail_module_1 = require("./mail/mail.module");
 const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
@@ -51,12 +50,6 @@ const orders_module_1 = require("./orders/orders.module");
 const order_entity_1 = require("./orders/entities/order.entity");
 const order_item_entity_1 = require("./orders/entities/order.item.entity");
 let AppModule = class AppModule {
-    configure(consumer) {
-        consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
-            path: '/graphql',
-            method: common_1.RequestMethod.POST,
-        });
-    }
 };
 AppModule = __decorate([
     (0, common_1.Module)({
@@ -99,8 +92,16 @@ AppModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
+                installSubscriptionHandlers: true,
                 autoSchemaFile: true,
-                context: ({ req }) => ({ user: req['user'] }),
+                subscriptions: {
+                    'subscriptions-transport-ws': {
+                        onConnect: (connectionParams) => ({
+                            token: connectionParams['x-jwt'],
+                        }),
+                    },
+                },
+                context: ({ req }) => ({ token: req.headers['x-jwt'] }),
             }),
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIATE_KEY,
