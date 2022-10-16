@@ -1,6 +1,9 @@
+import { Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decoratior';
+import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
 import { EditDishOutput } from 'src/restaurants/dtos/edit-dish.dto';
 import { User } from 'src/users/entities/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
@@ -9,13 +12,13 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
-import { PubSub } from 'graphql-subscriptions';
-
-const pubsub = new PubSub();
 
 @Resolver(() => Order)
 export class OrderResolver {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    @Inject(PUB_SUB) private readonly pubsub: PubSub,
+  ) {}
 
   @Mutation(() => CreateOrderOutput)
   @Role(['Customer'])
@@ -52,17 +55,14 @@ export class OrderResolver {
     return this.orderService.editOrder(user, editOrderInput);
   }
 
-  @Mutation(() => Boolean)
-  mangoIsReady() {
-    pubsub.publish('MangoCute', { readyMango: 'Your Mango is ready,' }); //trigger name should be same, payload should have a message
-    return true;
-  }
-
-  @Subscription(() => String) // Graphql will think this fn will return String, but we won't
-  @Role(['Any'])
-  readyMango(@AuthUser() user: User) {
-    console.log(user);
-    //async iteratior https://www.npmjs.com/package/graphql-subscriptions
-    return pubsub.asyncIterator('MangoCute');
+  @Subscription(() => Order, {
+    filter: (payload, _, context) => {
+      console.log(payload, context);
+      return true;
+    },
+  })
+  @Role(['Owner'])
+  pendingOrders() {
+    return this.pubsub.asyncIterator(NEW_PENDING_ORDER);
   }
 }
