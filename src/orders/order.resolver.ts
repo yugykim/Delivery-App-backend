@@ -56,10 +56,12 @@ export class OrderResolver {
   }
 
   @Subscription(() => Order, {
-    filter: (payload, _, context) => {
-      console.log(payload, context);
-      return true;
+    filter: ({ pendingOrders: { ownerId } }, _, { user }) => {
+      //Inside payload, there in an ownerId, Inside context, there is an User
+      return ownerId === user.id; //if it is true, get the orders.
     },
+    //pendingOrdrs has order and return order<Obj>. it wasn't objOrder
+    resolve: ({ pendingOrders: { order } }) => order,
   })
   @Role(['Owner'])
   pendingOrders() {
