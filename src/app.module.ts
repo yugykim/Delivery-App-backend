@@ -23,6 +23,7 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order.item.entity';
+import { CommonModule } from './common/common.module';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -91,6 +92,7 @@ database, this means that graphql modue should be in this*/
     UsersModule,
     RestaurantsModule,
     OrdersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
