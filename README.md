@@ -41,8 +41,8 @@ the backend of uber eats
 - Delete Dish
 
 - Orders CRUD
-- Orders Subscription (owner, customer, delivery)
-- Payments(CRON)
-
-- Orders Subscription (Owner, Customer, Deliver)
+- Orders Subscription 
+  - Pending Orders(Owner) (s: newOrder) (t: createOrder(newOrder))
+  - Order Status(Owner, Customer, Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
+  - Pending Pickup Order(Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
 - Payments (CRON)
