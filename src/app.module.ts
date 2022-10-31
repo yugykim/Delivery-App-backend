@@ -20,6 +20,7 @@ import { OrderItem } from './orders/entities/order.item.entity';
 import { CommonModule } from './common/common.module';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entities';
+import { ScheduleModule } from '@nestjs/schedule';
 
 /*App module will bring all
 database, this means that graphql modue should be in this*/
@@ -77,6 +78,7 @@ database, this means that graphql modue should be in this*/
       },
       context: ({ req }) => ({ token: req.headers['x-jwt'] }),
     }),
+    ScheduleModule.forRoot(),
     JwtModule.forRoot({
       privateKey: process.env.PRIATE_KEY,
     }),
