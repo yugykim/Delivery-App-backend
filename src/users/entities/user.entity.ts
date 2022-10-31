@@ -54,8 +54,9 @@ export class User extends CoreEntity {
   @OneToMany(() => Order, (order) => order.customer)
   orders: Order[];
 
+  //No pagination in earger relationship
   @Field(() => [Payment])
-  @OneToMany(() => Payment, (payment) => payment.user)
+  @OneToMany(() => Payment, (payment) => payment.user, { eager: true })
   payment: Payment[];
 
   @Field(() => [Order])
