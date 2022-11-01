@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, Interval, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import {
   CreatePaymentInput,
   CreatePaymentOuput,
@@ -44,7 +44,6 @@ export class PaymentsService {
           error: 'You are not allowed to do this.',
         };
       }
-
       await this.payments.save(
         this.payments.create({
           transactionId,
@@ -52,6 +51,11 @@ export class PaymentsService {
           restaurant,
         }),
       );
+      restaurant.IsPromoted = true;
+      const date = new Date();
+      date.setDate(date.getDate() + 7); //setDate is miles seconds
+      restaurant.promotedUntil = date;
+      this.restaurants.save(restaurant);
       return {
         ok: true,
       };
@@ -78,12 +82,17 @@ export class PaymentsService {
     }
   }
 
-  @Cron('30 * * * * *', {
-    name: 'myJob',
-  })
-  async checkForPayments() {
-    console.log('checking for payments/...');
-    const job = this.sceduleRegistry.getCronJob('myJob');
-    console.log(job);
+  @Interval(2000)
+  async checkPromotedRestaurants() {
+    const restaurants = await this.restaurants.find({
+      IsPromoted: true,
+      promotedUntil: LessThan(new Date()),
+    });
+    console.log(restaurants);
+    restaurants.forEach(async (restaurant) => {
+      restaurant.IsPromoted = false;
+      restaurant.promotedUntil = null;
+      await this.restaurants.save(restaurant);
+    });
   }
 }
