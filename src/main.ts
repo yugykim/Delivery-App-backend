@@ -6,6 +6,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe()); //make class validation working
   // app.use(JwtMiddleware); it is only for functional middleware
-  await app.listen(3000);
+  await app.listen(4000);
 }
 bootstrap();
