@@ -26,6 +26,8 @@ import {
 import { Category } from './entities/category.entity';
 import { Dish } from './entities/dish.entity';
 import { Restaurant } from './entities/restaurant.entity';
+import { MyRestaurantInput, MyRestaurantOutput } from './dtos/my-restaurant';
+import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -220,8 +222,8 @@ export class RestaurantService {
   async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
     try {
       const [results, totalResult] = await this.restaurants.findAndCount({
-        skip: (page - 1) * 25,
-        take: 25,
+        skip: (page - 1) * 3,
+        take: 3,
         order: {
           IsPromoted: 'DESC',
         },
@@ -229,7 +231,7 @@ export class RestaurantService {
       return {
         ok: true,
         results,
-        totalPages: Math.ceil(totalResult / 25),
+        totalPages: Math.ceil(totalResult / 3),
         totalResult,
       };
     } catch {
@@ -397,6 +399,40 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'could not delete dish',
+      };
+    }
+  }
+  async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+    try {
+      const restaurants = await this.restaurants.find({ owner });
+      return {
+        restaurants,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not find restaurants.',
+      };
+    }
+  }
+  async myRestaurant(
+    owner: User,
+    { id }: MyRestaurantInput,
+  ): Promise<MyRestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne(
+        { owner, id },
+        { relations: ['menu', 'orders'] },
+      );
+      return {
+        restaurant,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not find restaurant',
       };
     }
   }
