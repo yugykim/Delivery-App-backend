@@ -53,6 +53,7 @@ const common_module_1 = require("./common/common.module");
 const payments_module_1 = require("./payments/payments.module");
 const payment_entities_1 = require("./payments/entities/payment.entities");
 const schedule_1 = require("@nestjs/schedule");
+const uploads_module_1 = require("./uploads/uploads.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -123,6 +124,7 @@ AppModule = __decorate([
             orders_module_1.OrdersModule,
             common_module_1.CommonModule,
             payments_module_1.PaymentsModule,
+            uploads_module_1.UploadsModule,
         ],
         controllers: [],
         providers: [],
