@@ -83,7 +83,7 @@ export class RestaurantService {
     try {
       const restaurant = await this.restaurants.findOne({
         where: {
-          id: editRestaurantInput.restaurantID,
+          id: editRestaurantInput.restaurantId,
         },
         relations: ['owner'],
       });
@@ -105,7 +105,7 @@ export class RestaurantService {
       }
       await this.restaurants.save([
         {
-          id: editRestaurantInput.restaurantID,
+          id: editRestaurantInput.restaurantId,
           ...editRestaurantInput,
           ...(category && { category }), //if category exists, return Objn with = category
           //if it is null, we don't want to include category name so that we should write like this
