@@ -4,43 +4,40 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const BUCKET_NAME = 'Kimchinumbereats123';
+const BUCKET_NAME = 'yugy-uber-eat-123';
 
-@Controller('upload')
+@Controller('uploads')
 export class UploadsController {
+  constructor(private readonly configService: ConfigService) {}
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    AWS.config.update({
+    const s3 = new S3Client({
       credentials: {
-        accessKeyId: 'AKIAVWP24BI7YNRFYJLW',
-        secretAccessKey: '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',
+        accessKeyId: 'AKIAVWP24BI77PO2R3TF',
+        secretAccessKey: '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',
       },
+      region: 'ca-central-1',
     });
     //upload budcket
     try {
-      //it should be very unique name
-      /*
-      //create bucket for the begining
-      const upload = await new AWS.S3()
-        .createBucket({ Bucket: 'Kimchinumbereats123' })
-        .promise();
-      */
       const objectName = `${Date.now() + file.originalname}`;
-      const upload = await new AWS.S3()
-        .putObject({
-          Body: file.buffer,
-          Bucket: BUCKET_NAME,
-          Key: objectName,
-          ACL: 'public-read',
-        })
-        .promise();
-      console.log(upload);
+      const params = {
+        Body: file.buffer,
+        Bucket: BUCKET_NAME,
+        Key: objectName,
+        ContentType: 'binary/octet-stream',
+      };
+      const command = new PutObjectCommand(params);
+      await s3.send(command);
+      const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${objectName}`;
+      return { url };
     } catch (e) {
-      console.log(e);
+      return null;
     }
   }
 }

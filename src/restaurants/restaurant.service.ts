@@ -57,6 +57,7 @@ export class RestaurantService {
     createRestaurantInput: createRestaurantInput,
   ): Promise<createRestaurantOutput> {
     try {
+      console.log('create res');
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.owner = owner;
       //formatting categoryNames
