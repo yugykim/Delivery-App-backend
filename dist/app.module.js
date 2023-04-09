@@ -101,13 +101,18 @@ AppModule = __decorate([
                 installSubscriptionHandlers: true,
                 autoSchemaFile: true,
                 subscriptions: {
-                    'subscriptions-transport-ws': {
-                        onConnect: (connectionParams) => ({
-                            token: connectionParams['x-jwt'],
-                        }),
+                    'graphql-ws': {
+                        onConnect: (context) => {
+                            const { connectionParams, extra } = context;
+                            return (extra.token = connectionParams['x-jwt']);
+                        },
                     },
                 },
-                context: ({ req }) => ({ token: req.headers['x-jwt'] }),
+                context: ({ req, extra }) => {
+                    return {
+                        token: extra ? extra.token : req.headers['x-jwt'],
+                    };
+                },
             }),
             schedule_1.ScheduleModule.forRoot(),
             jwt_module_1.JwtModule.forRoot({

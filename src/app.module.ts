@@ -71,13 +71,18 @@ database, this means that graphql modue should be in this*/
       installSubscriptionHandlers: true, // this will labeled all of websockets in our server.
       autoSchemaFile: true,
       subscriptions: {
-        'subscriptions-transport-ws': {
-          onConnect: (connectionParams: any) => ({
-            token: connectionParams['x-jwt'],
-          }),
+        'graphql-ws': {
+          onConnect: (context: any) => {
+            const { connectionParams, extra } = context;
+            return (extra.token = connectionParams['x-jwt']);
+          },
         },
       },
-      context: ({ req }) => ({ token: req.headers['x-jwt'] }),
+      context: ({ req, extra }) => {
+        return {
+          token: extra ? extra.token : req.headers['x-jwt'],
+        };
+      },
     }),
     ScheduleModule.forRoot(),
     JwtModule.forRoot({

@@ -69,7 +69,7 @@ export class OrderService {
             if (dishOption.extra) {
               dishFinalPrice += dishOption.extra;
             } else {
-              const dishOptionChoice = dishOption.choice.find(
+              const dishOptionChoice = dishOption.choice?.find(
                 (optionChoice) => optionChoice.name === itemOption.choice,
               );
               if (dishOptionChoice) {
@@ -105,6 +105,7 @@ export class OrderService {
       });
       return {
         ok: true,
+        orderId: order.id,
       };
     } catch (error) {
       return {
@@ -184,19 +185,13 @@ export class OrderService {
         },
         relations: ['restaurant'],
       });
+      console.log(order);
       if (!order) {
         return {
           ok: false,
           error: 'Order is not exist',
         };
       }
-      if (!this.canSeeOrder(user, order)) {
-        return {
-          ok: false,
-          error: 'you cant see that',
-        };
-      }
-
       return {
         ok: true,
         order,
