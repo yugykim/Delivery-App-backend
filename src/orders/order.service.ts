@@ -185,7 +185,6 @@ export class OrderService {
         },
         relations: ['restaurant'],
       });
-      console.log(order);
       if (!order) {
         return {
           ok: false,
@@ -248,11 +247,12 @@ export class OrderService {
         },
       ]);
       const newOrder = { ...order, status };
+
       if (user.role === UserRole.Owner) {
         if (status === OrderStatus.Cooked) {
           //if user is owner and order status is cooked, pubsub publish order and status
           await this.pubsub.publish(NEW_COOKED_ORDER, {
-            cookedOrder: newOrder,
+            cookedOrders: newOrder,
           });
         }
       }
@@ -280,7 +280,6 @@ export class OrderService {
           id: orderId,
         },
       });
-      console.log(order);
       if (!order) {
         return {
           ok: false,

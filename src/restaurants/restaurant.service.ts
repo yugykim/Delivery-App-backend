@@ -57,7 +57,6 @@ export class RestaurantService {
     createRestaurantInput: createRestaurantInput,
   ): Promise<createRestaurantOutput> {
     try {
-      console.log('create res');
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.owner = owner;
       //formatting categoryNames
@@ -127,7 +126,6 @@ export class RestaurantService {
     owner: User,
     { restaurantid }: DeleteRestaurantInput,
   ): Promise<DeleteRestaurantOutput> {
-    console.log(restaurantid);
     try {
       const restaurant = await this.restaurants.findOne({
         where: {
@@ -147,7 +145,6 @@ export class RestaurantService {
           error: "You can't delete a restaurant that you don't own",
         };
       }
-      console.log('will Delete', restaurantid);
       //await this.restaurants.delete(restaurantID); //delete restaurant
       return {
         ok: true,
@@ -379,7 +376,6 @@ export class RestaurantService {
         },
         relations: ['restaurant'],
       });
-      console.log('will Delete', dishId);
       if (!dish) {
         return {
           ok: false,

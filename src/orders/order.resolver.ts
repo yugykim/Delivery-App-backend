@@ -78,8 +78,8 @@ export class OrderResolver {
 
   //cooked order when user is owner.
   @Subscription(() => Order)
-  @Role(['Owner'])
-  cookedOrder() {
+  @Role(['Delivery'])
+  cookedOrders() {
     return this.pubsub.asyncIterator(NEW_COOKED_ORDER);
   }
 
