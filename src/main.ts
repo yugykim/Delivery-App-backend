@@ -7,6 +7,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe()); //make class validation working
   app.enableCors();
   // app.use(JwtMiddleware); it is only for functional middleware
-  await app.listen(4000);
+  await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
