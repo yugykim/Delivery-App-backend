@@ -18,8 +18,8 @@ export class UploadsController {
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     const s3 = new S3Client({
       credentials: {
-        accessKeyId: 'AKIAVWP24BI77PO2R3TF',
-        secretAccessKey: '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',
+        accessKeyId: process.env.AWS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_KEY,
       },
       region: 'ca-central-1',
     });
