@@ -66,7 +66,6 @@ database, this means that graphql modue should be in this*/
       ],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      playground: process.env.NODE_ENV !== 'production',
       driver: ApolloDriver,
       installSubscriptionHandlers: true, // this will labeled all of websockets in our server.
       autoSchemaFile: true,
