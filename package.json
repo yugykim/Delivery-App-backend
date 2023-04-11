@@ -105,5 +105,9 @@
       ".entity.ts",
       ".constants.ts"
     ]
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "9.2.0"
   }
 }
