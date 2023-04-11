@@ -30,7 +30,7 @@ database, this means that graphql modue should be in this*/
     ConfigModule.forRoot({
       isGlobal: true, //access everywhere
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      ignoreEnvFile: process.env.NODE_ENV === 'prod',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('dev', 'production', 'test').required(), ////validate environment(Schema) -> safe security. it makes being availbe to check wether process.env has variable or not
         DB_HOST: Joi.string().required(),
@@ -52,10 +52,9 @@ database, this means that graphql modue should be in this*/
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: process.env.NODE_ENV !== 'prod',
       logging:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.NODE_ENV !== 'test',
+        process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [
         User,
         Verification,
