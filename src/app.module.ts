@@ -47,11 +47,15 @@ database, this means that graphql modue should be in this*/
     TypeOrmModule.forRoot({
       //save configurations to .env file
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT, //by default, everything from env is string, "+"" string -> number
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      ...(process.env.DATABASE_URL
+        ? { url: process.env.DATABASE_URL }
+        : {
+            host: process.env.DB_HOST,
+            port: +process.env.DB_PORT, //by default, everything from env is string, "+"" string -> number
+            username: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+          }),
       synchronize: process.env.NODE_ENV !== 'prod',
       logging:
         process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
