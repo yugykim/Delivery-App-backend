@@ -1,17 +1,21 @@
 # uber eats 
 
-the backend of uber eats 
+The backend of Delivery App
 
 ## Tech stacks 
 - NestJS
 - Typescript
 - TypeORM
 - GraphQL
+- Heroku 
 
 ## Feature
 - Unit Testing
 - End to End Testing
 - JWT Authentication
+- Email verification
+- Order subscription
+- Upload Images with AWS S3 bucket
 
 ## User Entity
 
@@ -30,21 +34,46 @@ the backend of uber eats
 - address
 - coverImg
 
-- Delete Restaurant
-- See categories
-- See Restauratns by Category 
-- See Restaurant
+- Restaurant CRUD
+- See all categories
+- See all Restauratns by Category 
 - Search Restaurant
 
-- Create Dish
-- Edit Dish
-- Delete Dish
+## Order Model
+- Order Status
+  - Pending
+  - Cooking
+  - Cooked
+  - PickedUp
+  - Delived
 
+- Order
+  - customer
+  - driverId
+  - driver
+  - restaurant
+  - items
+  - total
+  - status
+  
+- Order Item Input
+  - orderId
+  - items
+      - dishId
+      - options 
+        - name
+        - choice
+        - extra
+
+- Order Item Output
+  - orderId
+
+- Dish CRUD
 - Orders CRUD
 - Orders Subscription 
-  - Pending Orders(Owner) (s: newOrder) (t: createOrder(newOrder))
-  - Order Status(Owner, Customer, Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
-  - Pending Pickup Order(Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
+  - pendingOrders
+  - cookedOrders
+  - orderUpdates
 
-  
-- Payments (CRON)
+- takeOrder
+- createPayment
