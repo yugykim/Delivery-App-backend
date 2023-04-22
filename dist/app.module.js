@@ -62,9 +62,9 @@ AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
-                ignoreEnvFile: process.env.NODE_ENV === 'prod',
+                ignoreEnvFile: process.env.NODE_ENV === 'production',
                 validationSchema: Joi.object({
-                    NODE_ENV: Joi.string().valid('dev', 'prod', 'test').required(),
+                    NODE_ENV: Joi.string().valid('dev', 'production', 'test').required(),
                     DB_HOST: Joi.string().required(),
                     DB_PORT: Joi.string().required(),
                     DB_USERNAME: Joi.string().required(),
@@ -76,16 +76,15 @@ AppModule = __decorate([
                     MAILGUN_FROM_EMAIL: Joi.string().required(),
                 }),
             }),
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: process.env.DB_HOST,
-                port: +process.env.DB_PORT,
-                username: process.env.DB_USERNAME,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
-                synchronize: process.env.NODE_ENV !== 'prod',
-                logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-                entities: [
+            typeorm_1.TypeOrmModule.forRoot(Object.assign(Object.assign({ type: 'postgres' }, (process.env.DATABASE_URL
+                ? { url: process.env.DATABASE_URL }
+                : {
+                    host: process.env.DB_HOST,
+                    port: +process.env.DB_PORT,
+                    username: process.env.DB_USERNAME,
+                    password: process.env.DB_PASSWORD,
+                    database: process.env.DB_NAME,
+                })), { synchronize: process.env.NODE_ENV !== 'prod', logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test', entities: [
                     user_entity_1.User,
                     verification_entity_1.Verification,
                     restaurant_entity_1.Restaurant,
@@ -94,8 +93,7 @@ AppModule = __decorate([
                     order_entity_1.Order,
                     order_item_entity_1.OrderItem,
                     payment_entities_1.Payment,
-                ],
-            }),
+                ] })),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 installSubscriptionHandlers: true,
